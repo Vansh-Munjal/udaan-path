@@ -7,6 +7,7 @@ import sqlite3, smtplib, random, os, pandas as pd, requests
 from email.message import EmailMessage
 from flask_cors import CORS
 from dotenv import load_dotenv
+from sqlalchemy import inspect
 
 # Load env vars
 load_dotenv()
@@ -379,6 +380,16 @@ def logout():
     session.clear()
     flash("Logged out.", "info")
     return redirect("/login")
+
+
+def init_db():
+    with app.app_context():
+        inspector = inspect(db.engine)
+        if not inspector.has_table("user"):
+            db.create_all()
+            print("✅ users.db and tables created.")
+        else:
+            print("✅ users.db already exists.")
 
 if __name__ == "__main__":
     init_db()
