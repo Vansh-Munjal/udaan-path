@@ -382,15 +382,6 @@ def logout():
     return redirect("/login")
 
 
-def init_db():
-    with app.app_context():
-        inspector = inspect(db.engine)
-        if not inspector.has_table("user"):
-            db.create_all()
-            print("✅ users.db and tables created.")
-        else:
-            print("✅ users.db already exists.")
-
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
