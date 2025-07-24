@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>College Results - Udaan Path</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #eaf6ff;
+            margin: 0;
+            padding: 40px 20px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .description-row {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .college-table-container {
+            margin: 0 20px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .college-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .college-table thead th {
+            background-color: #007bff;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 12px 16px;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .college-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .college-table tbody tr:hover {
+            background-color: #f0f8ff;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s ease;
+        }
+
+        .save-btn.saved {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .no-data {
+            text-align: center;
+            font-size: 18px;
+            color: #999;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        .back-link {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .back-link:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+        <h2>Colleges in {{ state }} for {{ stream }} Stream</h2>
+        <div style="text-align: right; margin-bottom: 15px;">
+            <a href="{{ url_for('dashboard') }}" style="background: #17a2b8; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 14px; margin-right: 8px;">
+                ← Back to Search
+            </a>
+            <a href="{{ url_for('saved_colleges_dashboard') }}" style="background: #007bff; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 14px; margin-right: 8px;">
+                📚 View Saved Colleges
+            </a>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                Logout
+            </a>
+        </div>
+
+    </div>
+
+    <p class="description-row">
+        This table shows overall rating, academics, accommodation, faculty support, infrastructure, placements, and social life scores.
+    </p>
+
+    {% if colleges %}
+    <div class="college-table-container">
+        <table class="college-table">
+            <thead>
+                <tr>
+                    <th>College Name</th>
+                    <th>State</th>
+                    <th>Stream</th>
+                    <th>Rating</th>
+                    <th>Academic</th>
+                    <th>Accommodation</th>
+                    <th>Faculty</th>
+                    <th>Infrastructure</th>
+                    <th>Placement</th>
+                    <th>Social Life</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for college in colleges %}
+                    <tr>
+                        <td>{{ college['College_Name'] }}</td>
+                        <td>{{ college['State'] }}</td>
+                        <td>{{ college['Stream'] }}</td>
+                        <td>{{ college['Rating'] }}</td>
+                        <td>{{ college['Academic'] }}</td>
+                        <td>{{ college['Accommodation'] }}</td>
+                        <td>{{ college['Faculty'] }}</td>
+                        <td>{{ college['Infrastructure'] }}</td>
+                        <td>{{ college['Placement'] }}</td>
+                        <td>{{ college['Social_Life'] }}</td>
+                        <td>
+                            <button class="save-btn" onclick="saveCollege(this)">💾 Save</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="no-data">No colleges found for your selected criteria.</p>
+    {% endif %}
+</div>
+
+<script>
+    async function saveCollege(button) {
+        const row = button.closest('tr');
+        const cells = row.querySelectorAll('td');
+
+        const college = {
+            college_name: cells[0].innerText,
+            state: cells[1].innerText,
+            stream: cells[2].innerText,
+            rating: cells[3].innerText,
+            academic: cells[4].innerText,
+            accommodation: cells[5].innerText,
+            faculty: cells[6].innerText,
+            infrastructure: cells[7].innerText,
+            placement: cells[8].innerText,
+            social_life: cells[9].innerText
+        };
+
+        try {
+            const response = await fetch('/save-college-dashboard', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(college)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                button.textContent = "✅ Saved";
+                button.classList.add("saved");
+                button.disabled = true;
+            }
+        } catch (error) {
+            console.error('Error saving college:', error);
+        }
+    }
+</script>
+
+</body>
+</html>

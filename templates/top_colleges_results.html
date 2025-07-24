@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Top College Results - Udaan Path</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eaf6ff;
+      padding: 40px 20px;
+      margin: 0;
+      animation: fadePageIn 0.6s ease-in-out;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h2 {
+      color: #2c3e50;
+      font-size: 32px;
+      margin-bottom: 10px;
+      transition: color 0.3s ease;
+    }
+
+    h2:hover {
+      color: #007bff;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .logout-button, .home-button, .saved-button {
+      background: #007bff;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .logout-button:hover,
+    .home-button:hover,
+    .saved-button:hover {
+      background: #0056b3;
+    }
+
+    .description-row {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    .college-table-container {
+      overflow-x: auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background-color: #007bff;
+      color: white;
+      padding: 12px 16px;
+      text-transform: uppercase;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+      color: #2d3436;
+      text-align: center;
+    }
+
+    tbody tr:hover {
+      background-color: #f0f8ff;
+      transform: scale(1.01);
+      transition: 0.2s ease-in-out;
+    }
+
+    .no-data {
+      font-size: 18px;
+      color: #999;
+      margin-top: 30px;
+    }
+
+    button.save-button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button.save-button:hover {
+      background: #218838;
+    }
+
+    @keyframes fadePageIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <h2>Top Colleges</h2>
+      <div>
+        <a href="{{ url_for('dashboard') }}" class="home-button">🏠 Home</a>
+        <a href="{{ url_for('saved_colleges') }}" class="saved-button">💾 View Saved Colleges</a>
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+      </div>
+    </div>
+
+    <p class="description-row">
+      Displaying top ranked colleges sorted by {{ sort_by|title }}. Includes rank, faculty score, placement score, and perception.
+    </p>
+
+    {% if colleges is not none and not colleges.empty %}
+    <div class="college-table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>College Name</th>
+            <th>State</th>
+            <th>Stream</th>
+            <th>Rank</th>
+            <th>TLR</th>
+            <th>Placement</th>
+            <th>Perception</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in colleges.itertuples() %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.state }}</td>
+            <td>{{ row.Stream }}</td>
+            <td>{{ row.rank }}</td>
+            <td>{{ row.tlr }}</td>
+            <td>{{ row.go }}</td>
+            <td>{{ row.perception }}</td>
+            <td>
+              <button class="save-button"
+                onclick="saveCollege(this)"
+                data-name="{{ row.name }}"
+                data-state="{{ row.state }}"
+                data-stream="{{ row.Stream }}"
+                data-rank="{{ row.rank }}"
+                data-tlr="{{ row.tlr }}"
+                data-go="{{ row.go }}"
+                data-perception="{{ row.perception }}">
+                💾 Save
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="no-data">No colleges found for your selected filters.</p>
+    {% endif %}
+  </div>
+
+  <script>
+    async function saveCollege(button) {
+      const data = {
+        college_name: button.dataset.name,
+        state: button.dataset.state,
+        stream: button.dataset.stream,
+        rank: button.dataset.rank,
+        tlr: button.dataset.tlr,
+        placement: button.dataset.go,
+        perception: button.dataset.perception
+      };
+
+      try {
+        const res = await fetch("/save-college", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          button.textContent = "✅ Saved";
+          button.disabled = true;
+        } else {
+          alert("Failed to save college.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Saved Colleges - Udaan Path</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f8ff;
+            padding: 30px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        form {
+            display: inline;
+        }
+        .delete-button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .delete-button:hover {
+            background: #b52b38;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="back-link" href="{{ url_for('top_colleges_form') }}">← Back to College Search</a>
+        <h2>Your Saved Colleges</h2>
+
+        {% if colleges %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>State</th>
+                    <th>Stream</th>
+                    <th>Rank</th>
+                    <th>TLR</th>
+                    <th>Placement</th>
+                    <th>Perception</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in colleges %}
+                <tr>
+                    <td>{{ c[0] }}</td>
+                    <td>{{ c[1] }}</td>
+                    <td>{{ c[2] }}</td>
+                    <td>{{ c[3] }}</td>
+                    <td>{{ c[4] }}</td>
+                    <td>{{ c[5] }}</td>
+                    <td>{{ c[6] }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete_college') }}">
+                            <input type="hidden" name="college_name" value="{{ c[0] }}">
+                            <button type="submit" class="delete-button">🗑️ Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No colleges saved yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

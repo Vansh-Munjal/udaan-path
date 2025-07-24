@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - UdaanPath</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      animation: fadeIn 1.5s ease-in;
+      padding-top: 30px;
+    }
+
+    h1 {
+      font-size: 3.8rem;
+      color: #007BFF;
+      margin-bottom: 0.2rem;
+      animation: slideDown 1s ease-out;
+    }
+
+    p.tagline {
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .login-box {
+      background-color: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      transition: transform 0.3s;
+    }
+
+    .login-box:hover {
+      transform: translateY(-5px);
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #007BFF;
+      font-weight: 600;
+    }
+
+    label {
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin: 10px 0 5px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .switch-page {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .switch-page a {
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .switch-page a:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+    .flash-msg {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .flash-msg.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .flash-msg.danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .flash-msg.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+    .error {
+      font-size: 0.85rem;
+      color: #d9534f;
+      margin-bottom: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 UdaanPath</h1>
+  <p class="tagline">Empowering your journey from dreams to destinations. Let's take off!</p>
+
+  <div class="login-box">
+    <h2>🔒 Login</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <label for="username">Username:</label>
+      {{ form.username(size=32) }}
+      {% if form.username.errors %}
+        <div class="error">{{ form.username.errors[0] }}</div>
+      {% endif %}
+
+      <label for="password">Password:</label>
+      {{ form.password(size=32) }}
+      {% if form.password.errors %}
+        <div class="error">{{ form.password.errors[0] }}</div>
+      {% endif %}
+
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <div class="switch-page">
+      Don't have an account? <a href="{{ url_for('signup') }}">Sign up here</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Saved Colleges - Dashboard Results</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .college-table {
+            width: 100%;
+            min-width: 1000px; /* allows horizontal scroll if needed */
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .college-table th, .college-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .college-table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .college-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .college-table tr:hover {
+            background-color: #e9f7ff;
+        }
+
+        .delete-button {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .home-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <h2>🎓 Saved Colleges (Dashboard Search)</h2>
+        <a href="/dashboard" class="home-button">🏠 Back to Dashboard</a>
+    </div>
+
+    {% if colleges %}
+    <div class="table-wrapper">
+        <table class="college-table">
+            <thead>
+            <tr>
+                <th>College Name</th>
+                <th>State</th>
+                <th>Stream</th>
+                <th>Rating</th>
+                <th>Academic</th>
+                <th>Accommodation</th>
+                <th>Faculty</th>
+                <th>Infrastructure</th>
+                <th>Placement</th>
+                <th>Social Life</th>
+                <th>Delete</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for c in colleges %}
+            <tr>
+                <td>{{ c[0] }}</td>
+                <td>{{ c[1] }}</td>
+                <td>{{ c[2] }}</td>
+                <td>{{ c[3] }}</td>
+                <td>{{ c[4] }}</td>
+                <td>{{ c[5] }}</td>
+                <td>{{ c[6] }}</td>
+                <td>{{ c[7] }}</td>
+                <td>{{ c[8] }}</td>
+                <td>{{ c[9] }}</td>
+                <td>
+                    <form method="POST" action="/delete-dashboard-college">
+                        <input type="hidden" name="college_name" value="{{ c[0] }}">
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p style="text-align:center; font-size:18px; color: #777;">No saved colleges found.</p>
+    {% endif %}
+</div>
+</body>
+</html>
