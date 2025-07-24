@@ -31,6 +31,38 @@ def init_db():
             )
         ''')
 
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS saved_colleges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                college_name TEXT,
+                state TEXT,
+                stream TEXT,
+                rank INTEGER,
+                tlr REAL,
+                placement REAL,
+                perception REAL
+            )
+        ''')
+
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS saved_colleges_dashboard (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                college_name TEXT,
+                state TEXT,
+                stream TEXT,
+                rating REAL,
+                academic REAL,
+                accommodation REAL,
+                faculty REAL,
+                infrastructure REAL,
+                placement REAL,
+                social_life REAL
+            )
+        ''')
+
+
 # ------------------ FORMS ------------------
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
