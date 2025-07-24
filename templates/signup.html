@@ -95,6 +95,8 @@
     <h2>📝 Signup</h2>
     <form method="POST" action="{{ url_for('signup') }}">
       {{ form.hidden_tag() }}
+       <label>Full Name:</label>
+      {{ form.name(size=32) }}
       <label>Username:</label>
       {{ form.username(size=32) }}
       <label>Password:</label>

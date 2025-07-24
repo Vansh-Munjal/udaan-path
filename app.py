@@ -24,6 +24,7 @@ def init_db():
         conn.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
                 username TEXT UNIQUE,
                 password TEXT,
                 email TEXT
@@ -37,6 +38,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Login")
 
 class SignupForm(FlaskForm):
+    name = StringField("Full Name", validators=[DataRequired()])
     username = StringField("Username", validators=[DataRequired(), Length(min=4)])
     password = PasswordField("Password", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
@@ -72,6 +74,7 @@ def signup():
         otp = str(random.randint(1000, 9999))
         session['otp'] = otp
         session['temp_user'] = {
+            "name": form.name.data.strip(),
             "username": form.username.data.strip(),
             "password": generate_password_hash(form.password.data.strip()),
             "email": form.email.data.strip()
@@ -92,10 +95,12 @@ def verify_otp():
             user = session.get("temp_user")
             try:
                 with sqlite3.connect("users.db") as conn:
-                    conn.execute("INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-                                 (user["username"], user["password"], user["email"]))
+                    conn.execute("INSERT INTO users (name, username, password, email) VALUES (?, ?, ?, ?)",
+                                 (user["name"], user["username"], user["password"], user["email"]))
                 session.pop("temp_user")
                 session.pop("otp")
+                session['name'] = user['name']
+                session['user'] = user['username']
                 flash("✅ Signup successful.", "success")
                 return redirect("/login")
             except sqlite3.IntegrityError:
@@ -109,16 +114,15 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         with sqlite3.connect("users.db") as conn:
-            row = conn.execute("SELECT password FROM users WHERE username = ?", (form.username.data,)).fetchone()
-            if row and check_password_hash(row[0], form.password.data):
+            row = conn.execute("SELECT id, password, name FROM users WHERE username = ?", (form.username.data,)).fetchone()
+            if row and check_password_hash(row[1], form.password.data):
                 session['user'] = form.username.data
                 session['user_id'] = row[0]
+                session['name'] = row[2]
                 return redirect("/dashboard")
             else:
                 flash("❌ Invalid credentials", "danger")
     return render_template("login.html", form=form)
-
-
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
@@ -178,11 +182,9 @@ def top_colleges_form():
 
 @app.route('/top-colleges-results', methods=['POST'])
 def top_colleges_results():
-   
     stream = request.form.get('stream')
     state = request.form.get('state')
     sort_by = request.form.get('sort_by', 'rank')  
-
 
     df = pd.read_csv('data/top_colleges.csv')
     filtered = df[df['Stream'].str.lower() == stream.lower()]
@@ -194,7 +196,6 @@ def top_colleges_results():
     top_filtered = filtered.head(20)
     return render_template('top_colleges_results.html', colleges=top_filtered)
 
-# Display saved colleges from dashboard recommendations
 @app.route('/saved-colleges-dashboard')
 def saved_colleges_dashboard():
     if 'user_id' not in session:
@@ -214,7 +215,6 @@ def saved_colleges_dashboard():
 
     return render_template('saved_colleges_dashboard.html', colleges=colleges)
 
-# Save college from dashboard results
 @app.route('/save-college-dashboard', methods=['POST'])
 def save_college_dashboard():
     if 'user_id' not in session:
@@ -234,13 +234,12 @@ def save_college_dashboard():
     placement = data.get('placement')
     social_life = data.get('social_life')
 
-    if not all([name, state, stream]):  # Minimal check
+    if not all([name, state, stream]):
         return jsonify({'error': 'Missing required fields'}), 400
 
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
 
-    # Prevent duplicate saves
     c.execute("""
         SELECT 1 FROM saved_colleges_dashboard
         WHERE user_id = ? AND college_name = ?
@@ -277,7 +276,6 @@ def delete_dashboard_college():
 
     return redirect(url_for('saved_colleges_dashboard'))
 
-
 @app.route('/save-college', methods=['POST'])
 def save_college():
     if 'user_id' not in session:
@@ -297,7 +295,6 @@ def save_college():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
 
-    # Avoid duplicate saves
     c.execute("""
         SELECT * FROM saved_colleges WHERE user_id=? AND college_name=?
     """, (user_id, name))

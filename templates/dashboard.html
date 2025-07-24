@@ -192,7 +192,7 @@
         <h2>🎓 Udaan Path</h2>
         <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 14px;">Logout</a>
     </div>
-    <h3>Welcome, {{ session['user'] }} 👋</h3>
+    <h3>Welcome, {{ session['name'] }} 👋</h3>
     <p style="text-align: center;">Plan your career journey with confidence and clarity 🚀</p>
 
     <form method="POST" action="/get-colleges">
